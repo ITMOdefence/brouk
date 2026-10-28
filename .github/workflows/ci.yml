@@ -1,0 +1,64 @@
+# CI брокера msgserv. Сборка идёт в debian:trixie - эталонном окружении
+# System/start-guide.md в PUNos, - против снапшота PUNos на ревизии punos.ref.
+#
+# Соль для секретов создаётся на каждый прогон: тесты её не фиксируют, а
+# подставляют свою, поэтому случайная соль в CI ничего не ломает и заодно
+# проверяет, что сборка не зависит от конкретных значений секретов.
+
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  LC_ALL: C
+
+jobs:
+  check:
+    name: Сборка и тесты
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    timeout-minutes: 30
+    steps:
+      - name: Тулчейн
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends build-essential python3 git ca-certificates
+
+      - uses: actions/checkout@v4
+
+      - name: Снапшот PUNos
+        run: make vendor
+
+      - name: Сборка msgserv
+        run: make all
+
+      - name: Генератор каталога
+        run: make check-generator
+
+      - name: L1 - логика брокера
+        run: make check-unit
+
+      - name: L2 - протокол
+        run: make check-protocol
+
+      - name: L1 - инъекция отказов
+        run: make check-faults
+
+      - name: L3 - настоящий процесс
+        run: make check-integration
+
+      - name: Сборка не зависит от конфигурации
+        # Пустой каталог прав тоже обязан собираться: брокер уходит в PUNos
+        # до того, как в системе появятся приложения с правами.
+        run: make clean && make all

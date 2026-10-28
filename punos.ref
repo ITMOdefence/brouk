@@ -1,0 +1,4 @@
+# Ревизия PUNos, против которой собирается и тестируется msgserv.
+# Обновляется осознанно: вместе с ней меняется контракт appframework и ipclib.
+repository https://github.com/ITMOdefence/PUNos
+commit 6bd89908dcfe06038959df5faacdf64bfff2ad96

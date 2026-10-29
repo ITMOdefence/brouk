@@ -231,7 +231,7 @@ flowchart LR
         main --> logger
     end
     cat --> broker
-    env -. в applications.json PUNos .-> run
+    env -.->|"в applications.json PUNos"| run
 ```
 
 Один проход главного цикла: принять новые соединения → разобрать кадры каждого

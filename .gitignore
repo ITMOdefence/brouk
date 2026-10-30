@@ -1,1 +1,4 @@
+build/
+secret.salt
+vendor/
 .DS_Store

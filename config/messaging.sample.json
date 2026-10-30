@@ -1,0 +1,16 @@
+{
+  "applications": {
+    "gallery": {
+      "publish_topics": ["app.state"],
+      "subscribe_topics": ["ui.theme", "sensor.gps"],
+      "serve_methods": ["open_image"],
+      "call_targets": ["settings"]
+    },
+    "settings": {
+      "publish_topics": ["ui.theme"],
+      "subscribe_topics": ["app.state"],
+      "serve_methods": ["get_value", "set_value"],
+      "call_targets": ["gallery"]
+    }
+  }
+}
